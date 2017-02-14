@@ -1,0 +1,49 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="home-view">
+  <template>
+    <style include="shared-styles">
+      .progress-bar{
+        width: auto;
+      }
+      paper-progress{
+        --paper-progress-active-color: blue;
+      }
+    </style>
+
+    <template is="dom-bind">
+      <iron-ajax url="http://registry:8080/repositories" last-response="{{repositories}}" handle-as="json" loading="{{loading}}" auto></iron-ajax>
+      <vaadin-grid id="repositoryGrid">
+        <table>
+          <colgroup>
+            <col/>
+            <col/>
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Repositories</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template is="dom-repeat" items="[[repositories]]">
+              <tr>
+                <td>[[item.Name]]</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </vaadin-grid>
+      <paper-progress indeterminate disabled$="[[!loading]]" class="progress-bar"></paper-progress>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'home-view',
+    });
+  </script>
+</dom-module>
