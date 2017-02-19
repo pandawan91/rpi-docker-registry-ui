@@ -18,7 +18,9 @@
     "polymer": "Polymer/polymer#^1.6.0",
     "iron-ajax": "^1.4.3",
     "vaadin-grid": "^1.2.1",
-    "paper-progress": "^1.0.11"
+    "paper-progress": "^1.0.11",
+    "vaadin-split-layout": "^1.0.0",
+    "paper-button": "^1.0.14"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

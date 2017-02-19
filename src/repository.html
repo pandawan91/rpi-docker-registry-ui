@@ -1,0 +1,137 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/vaadin-split-layout/vaadin-split-layout.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id=repository-view>
+  <template>
+    <style include="shared-styles">
+    :host {
+      display: block;
+      background-color: white;
+      margin: 10px;
+      padding: 10px 20px;
+    }
+    vaadin-split-layout {
+      --vaadin-split-layout-splitter: {
+        fill: none;
+        min-width: 1px;
+        min-height: 1px;
+        background: var(--dark-theme-divider-color);
+      }
+    }
+    .progress-bar{
+      width: auto;
+    }
+    paper-progress{
+      --paper-progress-active-color: blue;
+    }
+    </style>
+    <iron-ajax url="http://registry:8080/tags?repositoryname=[[repositoryName]]"
+      disabled$="[[_disabled]]"
+      last-response="{{tags}}"
+      handle-as="json"
+      loading="{{tagLoading}}" auto></iron-ajax>
+    <iron-ajax url="http://registry:8080/repositories?repositoryname=[[repositoryName]]"
+      disabled$="[[_disabled]]"
+      last-response="{{repository}}"
+      handle-as="json"
+      loading="{{repositoryLoading}}" auto></iron-ajax>
+    <iron-ajax url="http://registry:8080/events?repositoryname=[[repositoryName]]"
+      disabled$="[[_disabled]]"
+      last-response="{{events}}"
+      handle-as="json"
+      loading="{{eventLoading}}" auto></iron-ajax>
+    <vaadin-split-layout vertical>
+      <h1>[[repositoryName]]</h1>
+      <vaadin-split-layout vertical>
+        <div>
+          Tags:
+          <template is="dom-repeat" items="[[tags]]">
+            | [[item.Name]] |
+          </template>
+          <paper-progress indeterminate
+            disabled$="[[!tagLoading]]"
+            hidden$="[[!tagLoading]]"
+            class="progress-bar"></paper-progress>
+        </div>
+        <vaadin-split-layout vertical>
+          <div>
+            <div>Description:</div>
+            <div>[[repository.Description]]</div>
+            <div>Note:</div>
+            <div>[[repository.Note]]</div>
+            <paper-progress indeterminate
+              disabled$="[[!repositoryLoading]]"
+              hidden$="[[!repositoryLoading]]"
+              class="progress-bar"></paper-progress>
+          </div>
+          <div>
+            Events:
+            <vaadin-grid
+              id="eventGrid"
+              selection-mode="disabled">
+              <table>
+                <colgroup>
+                  <col/>
+                  <col/>
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template is="dom-repeat" items="[[events]]" disabled$="[[eventLoading]]">
+                    <tr>
+                      <td>[[item.Stamp]]</td>
+                      <td>[[item.Name]]</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </vaadin-grid>
+            <paper-progress indeterminate
+              disabled$="[[!eventLoading]]"
+              hidden$="[[!eventLoading]]"
+              class="progress-bar"></paper-progress>
+          </div>
+        </vaadin-split-layout>
+      </vaadin-split-layout>
+    </vaadin-split-layout>
+  </template>
+  <script>
+    Polymer({
+      is: 'repository-view',
+      properties:{
+        repository:{
+          type: String,
+          observer: "_setRepositoryName"
+        },
+        repositoryName:{
+          type: String
+        },
+        dockerEvents:{
+          type: Array,
+          computed: "_computeEvents(events)"
+        },
+        _disabled: {
+          type: Boolean,
+          value: true
+        }
+      },
+      _computeEvents: function(events){
+        this.dockerEvents = events.forEach((event) => {
+          event.Stamp = new Date(event.Stamp).toLocaleString();
+        });
+      },
+      _setRepositoryName: function(repository){
+        this.repositoryName = this.repository.split("/")[1];
+        this._disabled = false;
+      }
+    });
+  </script>
+</dom-module>

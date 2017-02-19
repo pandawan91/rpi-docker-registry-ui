@@ -3,6 +3,7 @@
   "shell": "src/registry-app.html",
   "fragments": [
     "src/home.html",
+    "src/repository.html",
     "src/view404.html"
   ],
   "sourceGlobs": [
